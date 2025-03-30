@@ -20,10 +20,9 @@
   "description": "",
   "dependencies": {
     "axios": "^1.8.4",
-    "discord.js": "^13.4.0",  // Downgrade to a stable version of discord.js compatible with npm v7
+    "discord.js": "^14.18.0",
     "dotenv": "^16.4.7",
-    "node-cron": "^3.0.3",
-    "undici": "^4.0.0"  // Ensure undici is compatible with the current Node.js version
+    "node-cron": "^3.0.3"
   },
   "engines": {
     "node": "16.x"
