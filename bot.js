@@ -38,32 +38,37 @@ async function checkChannel(message) {
   return true;
 }
 
-// Send latest movies automatically to the channel every 30 minutes
-cron.schedule('*/30 * * * *', async () => {
-  const channel = await client.channels.fetch(ALLOWED_CHANNEL_ID);
-  if (channel) {
-    const movies = await getLatestMovies();
-    if (movies.length === 0) {
-      channel.send("Sorry, I couldn't fetch the latest movies at the moment.");
-      return;
-    }
-    
-    movies.forEach(movie => {
-      const embed = new EmbedBuilder()
-        .setTitle(movie.title)
-        .setDescription(movie.overview || 'No description available.')
-        .setColor(0x3498db)
-        .setImage(`https://image.tmdb.org/t/p/w500${movie.poster_path}`)
-        .setFooter({ text: `Release Date: ${movie.release_date}` });
-      channel.send({ embeds: [embed] });
-    });
-  }
-});
-
 // Event when the bot is ready
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
+  
+  // Start the cron job after the bot is ready
+  cron.schedule('*/30 * * * *', async () => {
+    try {
+      const channel = await client.channels.fetch(ALLOWED_CHANNEL_ID);
+      if (channel) {
+        const movies = await getLatestMovies();
+        if (movies.length === 0) {
+          channel.send("Sorry, I couldn't fetch the latest movies at the moment.");
+          return;
+        }
+
+        movies.forEach(movie => {
+          const embed = new EmbedBuilder()
+            .setTitle(movie.title)
+            .setDescription(movie.overview || 'No description available.')
+            .setColor(0x3498db)
+            .setImage(`https://image.tmdb.org/t/p/w500${movie.poster_path}`)
+            .setFooter({ text: `Release Date: ${movie.release_date}` });
+          channel.send({ embeds: [embed] });
+        });
+      }
+    } catch (err) {
+      console.error('Error in cron job:', err);
+    }
+  });
 });
 
 client.login(DISCORD_BOT_TOKEN);
+
 
